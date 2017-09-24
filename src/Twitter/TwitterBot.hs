@@ -18,6 +18,7 @@ import qualified Data.Vector                as V
 import           Network.HTTP.Conduit       (newManager, tlsManagerSetting)
 import           Network.Wreq               (get, responseBody)
 import           System.Environment         (lookupEnv)
+import           Twitter.Status             (Status (..), statusIsRetweetfd)
 import           Web.Authenticate.OAuth     (def, newCredential,
                                              oauthConsumerKey,
                                              oauthConsumerSecret)
@@ -31,10 +32,10 @@ type URL = String
 
 getTwInfoFromEnv :: IO (Maybe TWInfo)
 getTwInfoFromEnv = do
-  let Keys = [ "MONAKA_BOT_CONSUMER_KEY"
-             , "MONAKA_BOT_CONSUMER_SECRET"
-             , "MONAKA_BOT_ACCESS_TOKEN"
-             , "MONAKA_BOT_ACCESS_TOKEN_SECRET"
+  let Keys = [ "MONAKA_TWITTER_CONSUMER_KEY"
+             , "MONAKA_TWITTER_CONSUMER_SECRET"
+             , "MONAKA_TWITTER_ACCESS_TOKEN"
+             , "MONAKA_TWITTER_ACCESS_TOKEN_SECRET"
              ]
   [consumerKey, consumerSecret, accessToken, accessTokenSecret] <- map (fmap BS.pack) <$> traverse lookupEnv keys
   let tokens = buildOAuth <$> consumerKey <*> consumerSecret

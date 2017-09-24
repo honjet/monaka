@@ -5,13 +5,12 @@ import           Monaka.Poetry      (findPoem)
 import           System.Environment (getArgs)
 
 main :: IO ()
-main = do
-  getArgs
-  >>= readFile <$> head
-  >>= markovChain
-  >>= putThorough
-  >>= findPoem [5,7,5,7,7]
-  >>= putStrLn
+main = getArgs
+       >>= readFile <$> head
+       >>= markovChain
+       >>= putThorough
+       >>= findPoem [5,7,5,7,7]
+       >>= putStrLn
 
 putThorough :: String -> IO String
 putThorough src = do

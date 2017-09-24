@@ -1,12 +1,12 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Monaka.Markov where
+module Monaka.Markov
+  ( markovChain
+  ) where
 
-import           Control.Monad    (join)
+import           Control.Monad
 import           Data.List        (intercalate)
-import qualified Data.Map         as Map
 import qualified Data.MarkovChain as Markov
-import           Data.Maybe       (fromJust, fromMaybe, isNothing)
 import           System.Random
 import           Text.MeCab
 
