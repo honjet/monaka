@@ -1,15 +1,19 @@
 module Main where
 
-import Monaka.Poem
-import Monaka.Haiku
-import System.Environment (getArgs)
+import           Monaka.Markov
+import           Monaka.Poetry      (findPoem)
+import           System.Environment (getArgs)
 
 main :: IO ()
 main = do
-  args <- getArgs
-  source <- readFile $ head args
-  --sentence <- compose source
-  --putStrLn sentence
-  putStrLn =<< find57577 source
+  getArgs
+  >>= readFile <$> head
+  >>= markovChain
+  >>= putThorough
+  >>= findPoem [5,7,5,7,7]
+  >>= putStrLn
 
-
+putThorough :: String -> IO String
+putThorough src = do
+  putStrLn $ src ++ "\n"
+  return src
