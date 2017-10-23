@@ -1,18 +1,14 @@
 module Main where
 
-import           Monaka.Markov
-import           Monaka.Poetry      (findPoem)
-import           System.Environment (getArgs)
+import qualified Data.Text as T
+import Monaka.Markov (markovChain)
+import Monaka.Poetry (findPoem)
+import Web.Twitter (collectTweets, tweet)
 
 main :: IO ()
-main = getArgs
-       >>= readFile <$> head
-       >>= markovChain
-       >>= putThorough
-       >>= findPoem [5,7,5,7,7]
-       >>= putStrLn
-
-putThorough :: String -> IO String
-putThorough src = do
-  putStrLn $ src ++ "\n"
-  return src
+main = do
+    tweets <- collectTweets 500
+    let text = T.unlines tweets
+    markov <- markovChain (T.unpack text)
+    poem <- findPoem [5,7,5,7,7] markov
+    tweet $ T.pack poem
