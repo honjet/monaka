@@ -1,15 +1,18 @@
-import qualified Data.Text as T
+{-# LANGUAGE OverloadedStrings #-}
+
+import           Data.Maybe
+import qualified Data.Text     as T
 import qualified Data.Text.IO  as TIO
-import Monaka.Markov (markovChain)
-import Monaka.Poetry (findPoem)
-import Web.Twitter (collectTweets)
+import           Monaka.Markov
+import           Monaka.Poetry
+import           Text.MeCab
+import           Web.Twitter
 
 main :: IO ()
 main = do
     tweets <- collectTweets 500
     let text = T.unlines tweets
-    markov <- markovChain (T.unpack text)
-    poem <- findPoem [5,7,5,7,7] markov
+    markov <- markovNodes text
+    let poem = findPoemFromNodes [5,7,5,7,7] markov
     TIO.putStrLn text
-    putStrLn $ markov ++ "\n"
-    putStrLn poem
+    TIO.putStrLn $ fromMaybe "短歌が見つかりませんでした。" poem

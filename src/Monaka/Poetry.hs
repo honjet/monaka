@@ -1,40 +1,51 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Monaka.Poetry
   ( findPoem
+  , findPoemFromNodes
   ) where
 
 import           Control.Monad
 import           Data.List
 import           Data.List.Split
 import           Data.Maybe
+import qualified Data.Text       as T
 import           Text.MeCab
 
-data Morph = Morph { word     :: String
-                   , yomi     :: String
+data TNode = TNode { word     :: T.Text
+                   , yomi     :: T.Text
                    , len      :: Int
                    , headable :: Bool
                    , lastable :: Bool
                    } deriving (Eq, Show)
 
-findPoem :: [Int] -> String -> IO String
+findPoem :: [Int] -> T.Text -> IO T.Text
 findPoem sounds source = do
   mecab <- new ["mecab", "-l0"]
   nodes <- parseToNodes mecab source
-  let poem = findMorphs sounds [x | (Just x) <- map toMorph nodes]
+  let poem = findTNodes sounds [x | (Just x) <- map toTNode nodes]
   case poem of
-    Nothing     -> return "";
-    Just morphs -> return $ unlines $ map fromMorphs morphs
+    Nothing     -> return ""
+    Just morphs -> return $ T.unlines $ map fromTNodes morphs
 
-fromMorphs :: [Morph] -> String
-fromMorphs = intercalate "" . map word
+findPoemFromNodes :: [Int] -> [Node T.Text] -> Maybe T.Text
+findPoemFromNodes sounds nodes = do
+  let poem = findTNodes sounds [x | (Just x) <- map toTNode nodes]
+  case poem of
+    Nothing    -> Nothing
+    Just nodes -> Just $ T.unlines $ map fromTNodes nodes
 
-findMorphs :: [Int] -> [Morph] -> Maybe [[Morph]]
-findMorphs [] _ = return []
-findMorphs (x:xs) ys = do
+fromTNodes :: [TNode] -> T.Text
+fromTNodes = T.intercalate "" . map word
+
+findTNodes :: [Int] -> [TNode] -> Maybe [[TNode]]
+findTNodes [] _ = return []
+findTNodes (x:xs) ys = do
   morphs <- scrapeSounds x ys
-  return $ fst morphs : fromMaybe [] (findMorphs xs $ snd morphs)
+  return $ fst morphs : fromMaybe [] (findTNodes xs $ snd morphs)
 
--- Maybe (抜き出したMorphs、 抜き出した語句より後ろのMorphs)
-scrapeSounds :: Int -> [Morph] -> Maybe ([Morph], [Morph])
+-- Maybe (抜き出したTNodes、 抜き出した語句より後ろのTNodes)
+scrapeSounds :: Int -> [TNode] -> Maybe ([TNode], [TNode])
 scrapeSounds _ [] = Nothing
 scrapeSounds n xs = case peekSounds n xs of
   Nothing -> scrapeSounds n (tail xs)
@@ -42,10 +53,10 @@ scrapeSounds n xs = case peekSounds n xs of
              then return (ys, drop (length ys) xs)
              else scrapeSounds n (tail xs)
 
-isRightWords :: [Morph] -> Bool
+isRightWords :: [TNode] -> Bool
 isRightWords morphs = headable (head morphs) && lastable (last morphs)
 
-peekSounds :: Int -> [Morph] -> Maybe [Morph]
+peekSounds :: Int -> [TNode] -> Maybe [TNode]
 peekSounds _ [] = Nothing
 peekSounds n (x:xs)
   | len x > n = Nothing
@@ -53,8 +64,8 @@ peekSounds n (x:xs)
   | len x == n = return [x]
   | otherwise = (:) <$> Just x <*> peekSounds (n - len x) xs
 
-countMora :: String -> Int
-countMora xs = length $ filter (`elem` mora) xs
+countMora :: T.Text -> Int
+countMora xs = T.length $ T.filter (`elem` mora) xs
   where
     mora = ['ア','イ','ウ','エ','オ'
            ,'カ','キ','ク','ケ','コ'
@@ -83,10 +94,10 @@ countMora xs = length $ filter (`elem` mora) xs
 -- 6: 原形
 -- 7: 読み
 -- 8: 発音
-extractNode :: Node String -> [String]
-extractNode node = splitOn "," (nodeFeature node)
+extractNode :: Node T.Text -> [T.Text]
+extractNode node = T.splitOn "," (nodeFeature node)
 
-canBeHead :: Node String -> Bool
+canBeHead :: Node T.Text -> Bool
 canBeHead node = hinshi && hinshi1 -- && surface
   where
     -- Node 分解
@@ -117,7 +128,7 @@ canBeHead node = hinshi && hinshi1 -- && surface
     -- 文字チェック
     --surface =  any (`notElem` ignoreLetters) $ nodeSurface node
 
-canBeLast :: Node String -> Bool
+canBeLast :: Node T.Text -> Bool
 canBeLast node = hinshi && hinshi1 && katsuyou2 && surface
   where
     -- Node 分解
@@ -165,8 +176,8 @@ canBeLast node = hinshi && hinshi1 && katsuyou2 && surface
       "０" -> False
       _   -> True
 
-wrongNode :: Node String -> Bool
-wrongNode node = isKigou || isKaomoji || isSilence
+wrongNode :: Node T.Text -> Bool
+wrongNode node = isKigou || isKaomoji || isSilence || wrongWord
   where
     ext = extractNode node
 
@@ -189,12 +200,16 @@ wrongNode node = isKigou || isKaomoji || isSilence
           _    -> False
       _ -> False
 
+    wrongWord = case nodeSurface node of
+      "殺す" -> True
+      _    -> False
 
-toMorph :: Node String -> Maybe Morph
-toMorph node
+
+toTNode :: Node T.Text -> Maybe TNode
+toTNode node
   | wrongNode node = Nothing
   | otherwise = let ext = extractNode node
-                in Just Morph { word = nodeSurface node
+                in Just TNode { word = nodeSurface node
                               , yomi = last ext
                               , len = countMora (last ext)
                               , headable = canBeHead node

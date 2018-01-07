@@ -1,37 +1,0 @@
-
-./Setup.hs,15
-main main1,2
-
-./app/Main.hs,52
-module Main Main0,1
-main main4,5
-main main5,6
-
-./src/Lib.hs,666
-module LibLib0,1
-data Word Word12,13
-data Word = Begin Begin12,13
-data Word = Begin | Middle Middle12,13
-data Word = Begin | Middle String | End End12,13
-generateFsf generateFsf14,15
-generateFsf generateFsf15,16
-fromWord fromWord17,18
-fromWord fromWord18,19
-fromWords fromWords21,22
-fromWords fromWords22,23
-toWords toWords24,25
-toWords toWords25,26
-sample sample34,35
-sample sample35,36
-generateTable generateTable40,41
-generateTable generateTable41,42
-initialWords initialWords46,47
-initialWords initialWords47,48
-nextWords nextWords49,50
-nextWords nextWords50,51
-chainWords chainWords53,54
-chainWords chainWords54,55
-
-./test/Spec.hs,30
-main main0,1
-main main1,2

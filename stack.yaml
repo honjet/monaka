@@ -4,6 +4,14 @@
 # For advanced use and comprehensive documentation of the format, please see:
 # https://docs.haskellstack.org/en/stable/yaml_configuration/
 
+# A warning or info to be displayed to the user on config load.
+user-message: ! 'Warning (added by new or init): Some packages were found to be incompatible
+  with the resolver and have been left commented out in the packages section.
+
+  You can omit this message by removing it from stack.yaml
+
+'
+
 # Resolver to choose a 'specific' stackage snapshot or a compiler version.
 # A snapshot resolver dictates the compiler version and the set of packages
 # to be used for project dependencies. For example:
@@ -15,7 +23,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-9.4
+resolver: lts-10.2
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -40,22 +48,28 @@ packages:
 - location:
     git: git@github.com:morishin/hsmecab.git
     commit: 2da6677fbd42bb77d3b6e61c02edfeebe248e184
+  extra-dep: true
+# The following packages have been ignored due to incompatibility with the
+# resolver compiler, dependency conflicts with other packages
+# or unsatisfied dependencies.
+#- .
+
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: []
+# extra-deps: []
 
 # Override default flag values for local packages and extra-deps
-flags: {}
+# flags: {}
 
 # Extra package databases containing global packages
-extra-package-dbs: []
+# extra-package-dbs: []
 
 # Control whether we use the GHC we find on the path
 # system-ghc: true
 #
 # Require a specific version of stack, using version ranges
 # require-stack-version: -any # Default
-# require-stack-version: ">=1.5"
+# require-stack-version: ">=1.6"
 #
 # Override the architecture used by stack, especially useful on Windows
 # arch: i386
