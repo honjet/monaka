@@ -13,6 +13,6 @@ main = do
     tweets <- collectTweets 500
     let text = T.unlines tweets
     markov <- markovNodes text
-    let poem = findPoemFromNodes [5,7,5,7,7] markov
+    let poem = findPoemInNodes [5,7,5,7,7] markov
     TIO.putStrLn text
     TIO.putStrLn $ fromMaybe "短歌が見つかりませんでした。" poem

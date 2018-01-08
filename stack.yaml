@@ -48,7 +48,7 @@ packages:
 - location:
     git: git@github.com:morishin/hsmecab.git
     commit: 2da6677fbd42bb77d3b6e61c02edfeebe248e184
-  extra-dep: true
+  extra-dep: true 
 # The following packages have been ignored due to incompatibility with the
 # resolver compiler, dependency conflicts with other packages
 # or unsatisfied dependencies.
