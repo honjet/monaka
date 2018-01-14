@@ -141,6 +141,7 @@ canBeHead node = okHinshi && okHinshi1 -- && surface
       "助詞"   -> False
       "助動詞"  -> False
       "フィラー" -> False
+      "記号"   -> False
       _      -> True
 
     okHinshi1 = case hinshi1 feature of
