@@ -1,18 +1,18 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 module Web.Twitter
     ( collectTweets
     , tweet
     ) where
 
-import Data.Aeson
-import Data.Text as T
-import Data.Text.Encoding (encodeUtf8)
-import GHC.Generics
-import Network.HTTP.Conduit
-import System.Environment
-import Web.Authenticate.OAuth
+import           Data.Aeson
+import           Data.Text              as T
+import           Data.Text.Encoding     (encodeUtf8)
+import           GHC.Generics
+import           Network.HTTP.Conduit
+import           System.Environment
+import           Web.Authenticate.OAuth
 
 newtype Tweet = Tweet { text :: String
                       } deriving (Show, Generic)
@@ -51,7 +51,7 @@ getTweets name = do
         parseRequest
         $ "https://api.twitter.com/1.1/statuses/home_timeline.json?screen_name="
         ++ name
-        ++ "&count=1000"
+        ++ "&count=2000"
     m   <- newManager tlsManagerSettings
     res <- do
         signedreq <- signOAuth oauth cred req
